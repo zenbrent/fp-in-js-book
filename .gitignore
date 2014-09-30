@@ -1,0 +1,18 @@
+# OS generated files #
+######################
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Node Files #
+##############
+node_modules
+bower_components
+npm-debug.log
+
+# Project Files #
+#################
+public_build
+.tmp
+*.log
