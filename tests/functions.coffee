@@ -1,8 +1,8 @@
 { expect } = require 'chai'
 
 _ = require 'lodash'
-{ log, logjson } = require './../tools'
-fns = require '../fns'
+{ log, logjson } = require '../src/tools'
+fns = require '../src/fns'
 
 anObj =
   first: 'brent'

@@ -1,12 +1,12 @@
 _ = require('lodash');
 
 
-// defined on p12
+/** defined on p12 */
 function isIndexed(data) {
   return _.isArray(data) || _.isString(data);
 }
 
-// defined p12
+/** defined p12 */
 function nth(a, index) {
   if (!_.isNumber(index)) fail("Expected a number as the index");
   if (!isIndexed(a)) fail("Not supported on non-indexed type");
@@ -106,16 +106,16 @@ function interpolate(fn, coll) {
 }
 
 module.exports = {
-  interpolate: interpolate,
-  lessThanOrEqualSorter: lessThanOrEqualSorter,
-  comparator: comparator,
-  existy: existy,
-  truthy: truthy,
-  doWhen: doWhen,
   allOf: allOf,
   anyOf: anyOf,
   cat: cat,
+  comparator: comparator,
   construct: construct,
-  mapcat: mapcat
+  doWhen: doWhen,
+  existy: existy,
+  interpolate: interpolate,
+  lessThanOrEqualSorter: lessThanOrEqualSorter,
+  mapcat: mapcat,
+  truthy: truthy
 }
 
