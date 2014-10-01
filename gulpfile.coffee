@@ -9,11 +9,9 @@ mocha = require 'gulp-mocha'
 coffeeify = require 'coffeeify'
 # browserify = require 'browserify'
 
-# paths
+# paths: key is the task name, value is the paths to watch.
 paths =
-  coffee: './**/*.coffee'
-  js: './**/*.js'
-  tests: ['./tests/**/*.js', './tests/**/*.coffee']
+  test: ['tests/**/*.js', 'tests/**/*.coffee']
 
 # # javascript
 # gulp.task 'coffee', ->
@@ -30,12 +28,12 @@ paths =
 #     .pipe gulp.dest paths.public
 
 
+gulp.task 'test', ->
+  gulp.src paths.test, { read: false }
+    .pipe mocha { reporter: 'spec' }
+
 gulp.task 'watch', ->
   awatch gulp, paths
-
-gulp.task 'test', ->
-  gulp.src paths.tests, { read: false }
-    .pipe mocha { reporter: 'spec' }
 
 # gulp.task 'default', ['coffee', 'html', 'stylus', 'server', 'watch']
 gulp.task 'default', ['test']
