@@ -1,9 +1,21 @@
-_ = require('lodash');
+/**
+ * It is better to have 100 functions operate on one data structure than 10 functions on 10 data structures.
+ *   – Alan Perlis
+ */
 
+_ = require('lodash');
 
 /** defined on p12 */
 function isIndexed(data) {
   return _.isArray(data) || _.isString(data);
+}
+
+/** defined p9 */
+function fail(thing) {
+  throw new Error(thing);
+}
+function warn(thing) {
+  console.warn(thing);
 }
 
 /** defined p12 */
@@ -15,7 +27,7 @@ function nth(a, index) {
 }
 
 function second(a) {
-  return nth(2, a);
+  return nth(a, 1);
 }
 
 // defined on p14
@@ -49,12 +61,21 @@ function truthy(arg) {
   return arg !== false && existy(arg);
 }
 
-// defined on p
+/** defined on p20 */
 function doWhen(cond, action) {
   if(truthy(cond))
     return action();
   else
     return undefined;
+}
+
+/** defined on p20 */
+function executeIfHasField(target, name) {
+  // Using existy instead of _.has because _.has only checks
+  // self-keys.
+  return doWhen(existy(target[name]), function() {
+    return _.result(target, name);
+  });
 }
 
 // defined on p
@@ -76,46 +97,55 @@ function anyOf() {
   );
 }
 
-// defined on p
+/** defined on p39 */
+// concatenate!
 function cat() {
-  var head = _.first(arguments)
+  var head = _.first(arguments);
   if(existy(head))
     return head.concat.apply(head, _.rest(arguments));
   else
     return [];
 }
 
-// defined on p
-function construct(tail,head) {
+// defined on p40
+function construct(head,tail) {
   return cat([head], _.toArray(tail));
 }
 
-// defined on p
+// defined on p40
 function mapcat(fn, coll) {
-  return cat.apply(null, _.map(coll), fn);
+  return cat.apply(null, _.map(coll, fn));
 }
 
-// defined on p
+// defined on p40
 function butLast(coll) {
   return _.toArray(coll).slice(0, -1);
 }
 
-// defined on p
-function interpolate(fn, coll) {
-  return mapcat(fn, butLast);
+// defined on p40
+function interpose(inter, coll) {
+  return butLast(mapcat(function(e) {
+    return construct(e, [inter]);
+  }, coll));
 }
 
 module.exports = {
   allOf: allOf,
   anyOf: anyOf,
+  butLast: butLast,
   cat: cat,
   comparator: comparator,
   construct: construct,
   doWhen: doWhen,
+  executeIfHasField: executeIfHasField,
   existy: existy,
-  interpolate: interpolate,
+  fail: fail,
+  interpose: interpose,
   lessThanOrEqualSorter: lessThanOrEqualSorter,
   mapcat: mapcat,
-  truthy: truthy
+  nth: nth,
+  second: second,
+  truthy: truthy,
+  warn: warn,
 }
 
