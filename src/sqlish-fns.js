@@ -1,37 +1,41 @@
+/**
+ * So far, everything in this is from chapters 1 and 2.
+ */
+
 _ = require('lodash');
 fns = require('./fns');
 
 /** from p16 */
 function lameCSV(str) {
   return _.reduce(str.split("\n"), function(table, row) {
-    table.push(_.map(row.split(","), function(c) { return c.trim() }));
+    table.push(_.map(row.split(","), function(c) { return c.trim(); }));
     return table;
   }, []);
-};
+}
 
 /** defined p17 */
 function selectNames(table) {
   return _.rest(_.map(table, _.first));
-};
+}
 
 /** defined p18 */
 function selectAges(table) {
   return _.rest(_.map(table, fns.second));
-};
+}
 
 /** defined p18 */
 function selectHairColor(table) {
   return _.rest(_.map(table, function(row) {
     return fns.nth(row, 2);
   }));
-};
+}
 
 /** defined p44 */
 function project(table, keys) {
   return _.map(table, function(obj) {
     return _.pick.apply(null, fns.construct(obj, keys));
   });
-};
+}
 
 /**
 * defined p46
@@ -49,7 +53,7 @@ function rename(obj, newNames) {
       return o;
   },
   _.omit.apply(null, fns.construct(obj, _.keys(newNames))));
-};
+}
 
 
 /**
@@ -59,7 +63,7 @@ function rename(obj, newNames) {
 function as(table, newNames) {
   return _.map(table, function(obj) {
     return rename(obj, newNames); });
-};
+}
 
 /**
 * defined p47
@@ -73,7 +77,8 @@ function restrict(table, pred) {
       return newTable;
     else
       return _.without(newTable, obj);
-  }, table); };
+  }, table);
+}
 
 
 module.exports = {
@@ -85,4 +90,4 @@ module.exports = {
   selectAges: selectAges,
   selectHairColor: selectHairColor,
   selectNames: selectNames,
-}
+};

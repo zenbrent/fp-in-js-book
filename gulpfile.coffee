@@ -40,7 +40,7 @@ paths =
   
 
 gulp.task 'test', ->
-  gulp.src paths.test, { read: false }
+  gulp.src 'tests/**/*', { read: false }
     # .pipe mocha { reporter: 'nyan' }
     .pipe mocha { reporter: 'spec' }
 

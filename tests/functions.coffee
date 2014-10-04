@@ -4,15 +4,13 @@ _ = require 'lodash'
 { log, logjson } = require '../src/tools'
 fns = require '../src/fns'
 
-anObj =
-  first: 'brent'
-  second: 'brimhall'
-  id: 7482948505
-
-somearr = [ 123, 456, 'lolz' ]
-
 describe 'functionals', ->
   describe 'pick', ->
+    anObj =
+      first: 'brent'
+      second: 'brimhall'
+      id: 7482948505
+
     it 'should grap specific keys from an object', ->
       val = _.pick anObj, 'first'
       expect(val).to.deep.equal({first: 'brent'})
