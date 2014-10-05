@@ -4,8 +4,8 @@
  * in JS without using said features.
  */
 
-var _ = require('lodash')
-  , fns = require('./fns');
+var _ = require('lodash'),
+    fns = require('./fns');
 
 /**
  * Simulating a naîve, dynamic scoping mechanism
@@ -52,11 +52,28 @@ var dynamicLookup = function(k) {
   return _.last(slot);
 };
 
+/**
+ * Encapsulate data in a function.
+ */
+var pingpong = (function (){
+  var privateVal = 0;
+
+  return {
+    inc: function (n) {
+      return privateVal += n;
+    },
+    dec: function (n) {
+      return privateVal -= n;
+    }
+  }
+})()
+
 module.exports = {
   globals: globals,
   stackBinder: stackBinder,
   stackUnbinder: stackUnbinder,
   dynamicLookup: dynamicLookup,
-}
+  pingpong: pingpong,
+};
 
 

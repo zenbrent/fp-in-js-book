@@ -3,7 +3,7 @@
 _ = require 'lodash'
 tools = require '../src/tools'
 
-describe.only 'tools for testing', ->
+describe 'tools for testing', ->
   testData =
     string:
       data: 'asdf'

@@ -80,7 +80,6 @@ function restrict(table, pred) {
   }, table);
 }
 
-
 module.exports = {
   as: as,
   lameCSV: lameCSV,

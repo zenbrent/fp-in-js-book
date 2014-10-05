@@ -6,6 +6,8 @@
   "dependencies": {
     "browserify": "^5.12.0",
     "chai": "^1.9.1",
+    "chai-interface": "^1.1.0",
+    "chai-things": "^0.2.0",
     "coffee-script": "^1.8.0",
     "coffeeify": "^0.7.0",
     "concat-stream": "^1.4.6",

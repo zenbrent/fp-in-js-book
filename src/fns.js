@@ -40,7 +40,7 @@ function comparator(pred) {
       return 1;
     else
       return 0;
-  }
+  };
 }
 
 // defined on p14
@@ -129,23 +129,74 @@ function interpose(inter, coll) {
   }, coll));
 }
 
+function compliment(pred) {
+  return function() {
+    return !pred.apply(null, _.toArray(arguments));
+  };
+}
+
+function isEven(val) {
+  return (val % 2) === 0;
+}
+
+var isOdd = compliment(isEven);
+
+function plucker(field) {
+  return function(obj) {
+    return (obj && obj[field]);
+  };
+}
+
+/**
+ * valueFun is a fn to determine how to interpret each val in the coll.
+ * bestFun compares to values, as given by valueFun.
+ * e.g.: finder(_.identity, Math.max, [0,6,3,9,1,])
+ * defined on p70
+ */
+function finder(valueFun, bestFun, coll) {
+  return _.reduce(coll, function(best, current) {
+    var bestValue = valueFun(best);
+    var currentValue = valueFun(current);
+
+    return (bestValue === bestFun(bestValue, currentValue)) ? best : current;
+  });
+}
+
+/**
+ * Or, we can give a best-fit function if we assume the fun knows how to
+ * 'unwrap' its own arguments, and i t returns true if the first arg is
+ * 'better' than the second.
+ * defined on p41
+ */
+function best(fun, coll) {
+  return _.reduce(coll, function(x,y) {
+    return fun(x,y) ? x : y;
+  });
+}
+
 module.exports = {
   allOf: allOf,
   anyOf: anyOf,
+  best: best,
   butLast: butLast,
   cat: cat,
   comparator: comparator,
+  compliment: compliment,
   construct: construct,
   doWhen: doWhen,
   executeIfHasField: executeIfHasField,
   existy: existy,
   fail: fail,
+  finder: finder,
   interpose: interpose,
+  isEven: isEven,
+  isOdd: isOdd,
+  lessOrEqual: lessOrEqual,
   lessThanOrEqualSorter: lessThanOrEqualSorter,
   mapcat: mapcat,
   nth: nth,
+  plucker: plucker,
   second: second,
   truthy: truthy,
   warn: warn,
-}
-
+};

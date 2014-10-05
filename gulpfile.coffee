@@ -6,6 +6,7 @@ source = require 'vinyl-source-stream'
 buffer = require 'vinyl-buffer'
 mocha = require 'gulp-mocha'
 docker = require './gulp_wrappers/docker.js'
+_ = require 'lodash'
 
 # jsdoc = require 'gulp-jsdoc'
 
@@ -40,9 +41,11 @@ paths =
   
 
 gulp.task 'test', ->
+  reporters = { 'spec', 'nyan', 'dot', 'landing', 'tap', 'list', 'progress', 'json-stream', 'min', 'doc' }
+  reportersArr = _.values reporters
   gulp.src 'tests/**/*', { read: false }
-    # .pipe mocha { reporter: 'nyan' }
-    .pipe mocha { reporter: 'spec' }
+    .pipe mocha { reporter: reporters.spec }
+    # .pipe mocha { reporter: reportersArr[_.random(0,reportersArr.length, false)] }
 
 gulp.task 'watch', ->
   awatch gulp, paths
