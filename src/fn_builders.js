@@ -10,6 +10,10 @@ _ = require('lodash');
 var intro = require('./introducing');
 var fns = require('./fns');
 
+function dispatch(/* functions */) {
+
+};
 
 module.exports = {
+  dispatch: dispatch,
 }

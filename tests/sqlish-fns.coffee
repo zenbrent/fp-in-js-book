@@ -2,7 +2,6 @@
 
 _ = require 'lodash'
 { log, logjson } = require '../src/tools'
-fns = require '../src/fns'
 
 sql = require '../src/sqlish-fns'
 

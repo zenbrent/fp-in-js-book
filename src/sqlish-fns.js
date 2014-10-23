@@ -3,7 +3,7 @@
  */
 
 _ = require('lodash');
-fns = require('./fns');
+fns = require('./all_fns');
 
 /** from p16 */
 function lameCSV(str) {

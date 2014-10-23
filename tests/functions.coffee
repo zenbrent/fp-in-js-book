@@ -10,7 +10,7 @@ intro = require '../src/introducing'
 # .to.deep.include.members(testListSorted)
 # .and.have.lengthOf(testList.length)
 
-describe.only 'functionals', ->
+describe 'functionals', ->
   anObj =
     first: 'brent'
     last: 'brimhall'
