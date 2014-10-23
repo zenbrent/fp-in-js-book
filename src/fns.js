@@ -1,84 +1,13 @@
 /**
- * It is better to have 100 functions operate on one data structure than 10 functions on 10 data structures.
- *   – Alan Perlis
+ * This file still needs to be split up by chapter.
  */
 
 _ = require('lodash');
 
-/** defined on p12 */
-function isIndexed(data) {
-  return _.isArray(data) || _.isString(data);
-}
+var intro = require('./introducing');
+var existy = intro.existy;
 
-/** defined p9 */
-function fail(thing) {
-  throw new Error(thing);
-}
-function warn(thing) {
-  console.warn(thing);
-}
-
-/** defined p12 */
-function nth(a, index) {
-  if (!_.isNumber(index)) fail("Expected a number as the index");
-  if (!isIndexed(a)) fail("Not supported on non-indexed type");
-  if ((index < 0) || (index > a.length - 1))
-    fail("Index value is out of bounds"); return a[index];
-}
-
-function second(a) {
-  return nth(a, 1);
-}
-
-// defined on p14
-// Map a predicate to a comparator
-function comparator(pred) {
-  return function (x, y) {
-    if (truthy(pred(x, y)))
-      return -1;
-    else if (truthy(pred(y, x)))
-      return 1;
-    else
-      return 0;
-  };
-}
-
-// defined on p14
-function lessOrEqual(x,y) {
-  return x <= y;
-}
-
-// defined on p14
-var lessThanOrEqualSorter = comparator(lessOrEqual);
-
-// defined on p
-function existy(arg) {
-  return arg != null;
-}
-
-// defined on p
-function truthy(arg) {
-  return arg !== false && existy(arg);
-}
-
-/** defined on p20 */
-function doWhen(cond, action) {
-  if(truthy(cond))
-    return action();
-  else
-    return undefined;
-}
-
-/** defined on p20 */
-function executeIfHasField(target, name) {
-  // Using existy instead of _.has because _.has only checks
-  // self-keys.
-  return doWhen(existy(target[name]), function() {
-    return _.result(target, name);
-  });
-}
-
-// defined on p
+// defined on p36
 /* check this */
 function allOf() {
   return _.reduceRight(
@@ -174,29 +103,183 @@ function best(fun, coll) {
   });
 }
 
+/**
+ * defined p72
+ */
+function repeat(times, value) {
+  return _.map(_.range(times), function() { return value });
+}
+
+/**
+ * Even better - use a funciton, not a value.
+ * defined p73
+ */
+function repeatedly(times, fun) {
+  return _.map(_.range(times), fun);
+}
+
+/**
+ * Even BETTER! Use a fn for the iterator.
+ * Defined p74
+ */
+function iterateUntil(fun, check, init) {
+  var ret = [],
+      result = fun(init);
+
+  while (check(result)) {
+    ret.push(result);
+    result = fun(result);
+  }
+
+  return ret;
+}
+
+/**
+ * Sometimes also called k
+ * This is an instance of a 'combinator'
+ * defined p76
+ */
+function always(val) {
+  return function() { return val; }
+}
+
+/**
+ * defined p76
+ */
+function invoker(name, method) {
+  return function(target /* args... */) {
+    if (!existy(target)) fail("Must provide a target");
+
+    var targetMethod = target[name],
+        args = _.rest(arguments);
+
+    return intro.doWhen(
+      (existy(targetMethod) && (method === targetMethod)),
+      function() {
+        return targetMethod.apply(target, args);
+      }
+    );
+  };
+}
+
+/**
+ * defined p77
+ */
+function uniqueString(length) {
+  return Math.random().toString(36).substr(2, length);
+}
+
+/**
+ * Given a function and defaults, return a new function that takes a list
+ * and calls the given fn for every item that is existy.
+ * defined p80
+ */
+function fnull(fn /*, defaults */) {
+  var defaults = _.rest(arguments);
+
+  return function(/*args*/) {
+    // Should this map over arguments or defaults? This doesn't
+    // gaurantee anything if the arguments are just not passed in.
+    // e.g.:
+    // safeMult = fnull(((total, n) -> total * n), 1, 1)
+    // safeMult() //> undefined
+    // I would expect 1.
+    var args = _.map(arguments, function(e, i) {
+      return existy(e) ? e : defaults[i];
+    });
+
+    return fn.apply(null, args);
+  };
+}
+
+/**
+ * Create a function that will give a value from an object, or
+ * give the default value provided.
+ */
+function defaults(d) {
+  return function(o, k) {
+    var val = fnull(_.identity, d[k]);
+    return o && val(o[k]);
+  };
+};
+
+/**
+ * Something to validate objects!
+ * Take a list of validators and return a function to check an object against them.
+ * defined p82
+ */
+function checker(/* validators */) {
+  var validators = _.toArray(arguments);
+
+  return function(obj) {
+    return _.reduce(validators, function(errs, check) {
+      if (check(obj))
+        return errs;
+      else
+        // _.chain is to avoid:
+        // errs.push(check.message);
+        // return errs;
+        // don't know if I like.
+        // "The use of _.chain definitely requires more characters, but it hides the array mutation nicely."
+        return _.chain(errs).push(check.message).value();
+    }, []);
+  };
+};
+
+/**
+ * Create a validator.
+ * defined p83
+ */
+function validator(message, fun) {
+  var f = function(/* args */) {
+    return fun.apply(fun, arguments);
+  };
+
+  f['message'] = message;
+  return f;
+};
+
+/**
+ * Check to see if an object has some keys
+ * defined p84
+ */
+function hasKeys() {
+  var keys = _.toArray(arguments);
+
+  var fun = function(obj) {
+    return _.every(keys, function(k) {
+      return _.has(obj, k);
+    });
+  };
+
+  fun.message = cat(["Must have values for keys:"], keys).join(' ');
+  return fun;
+};
+
+
 module.exports = {
   allOf: allOf,
+  always: always,
   anyOf: anyOf,
   best: best,
   butLast: butLast,
   cat: cat,
-  comparator: comparator,
+  checker: checker,
   compliment: compliment,
   construct: construct,
-  doWhen: doWhen,
-  executeIfHasField: executeIfHasField,
-  existy: existy,
-  fail: fail,
+  defaults: defaults,
   finder: finder,
+  fnull: fnull,
+  hasKeys: hasKeys,
   interpose: interpose,
+  invoker: invoker,
   isEven: isEven,
   isOdd: isOdd,
-  lessOrEqual: lessOrEqual,
-  lessThanOrEqualSorter: lessThanOrEqualSorter,
+  iterateUntil: iterateUntil,
   mapcat: mapcat,
-  nth: nth,
   plucker: plucker,
-  second: second,
-  truthy: truthy,
-  warn: warn,
+  repeat: repeat,
+  repeatedly: repeatedly,
+  uniqueString: uniqueString,
+  validator: validator,
 };
