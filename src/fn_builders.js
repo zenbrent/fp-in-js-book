@@ -11,6 +11,7 @@ var intro = require('./introducing');
 var fns = require('../src/fns');
 
 var existy = intro.existy;
+var construct = fns.construct;
 // var fail = intro.fail;
 
 /**
@@ -38,6 +39,9 @@ function dispatch(/* functions */) {
   };
 }
 
+/**
+ * Defined p95
+ */
 function curry(fn) {
   return function(arg) {
     return fn(arg);
@@ -45,6 +49,7 @@ function curry(fn) {
 }
 
 /**
+ * Defined p96
  * Currying right so you can use currying to configure functions.
  * The main argument in JS is usually the left, the "specialization"
  * arguments are on the right, e.g. the number and radix in parseInt.
@@ -57,10 +62,71 @@ function curry2(fn) {
   };
 }
 
+/**
+ * Defined p98
+ */
+function curry3(fun) {
+  return function(last) {
+    return function(middle) {
+      return function(first) {
+        return fun(first, middle, last);
+      };
+    };
+  };
+}
 
+/** Convert a number to hex */
+function toHex(n) {
+  var hex = n.toString(16);
+  return (hex.length < 2) ? [0, hex].join(''): hex;
+}
+
+/** Convert an rgb set to hex */
+function rgbToHexString(r, g, b) {
+  return ["#", toHex(r), toHex(g), toHex(b)].join('');
+}
+
+// On General currying:
+// "That JavaScript allows a variable number of arguments to functions actively works against currying in general and is often confusing."
+// Partial tends to work better when dealing with varargs.
+
+function partial1(fn, arg1) {
+  return function(/* args */) {
+    var args = fns.construct(arg1, arguments);
+    return fn.apply(fn, args);
+  };
+  // or just this:
+  // return fun.bind(undefined, arg1);
+}
+
+function partial2(fn, arg1, arg2) {
+  return function(/* args */) {
+    var args = fns.cat([arg1, arg2], _.toArray(arguments));
+    return fn.apply(fn, args);
+  };
+  // or just this:
+  // return fun.bind(undefined, arg1);
+}
+
+/**
+ * defined p103
+ */
+function partial(fn /*, args */) {
+  var pargs = _.rest(arguments);
+
+  return function(/* args */) {
+    var args = fns.cat(pargs, _.toArray(arguments));
+    return fn.apply(fn, args);
+  };
+}
 
 module.exports = {
   curry2: curry2,
+  curry3: curry3,
   curry: curry,
   dispatch: dispatch,
+  partial1: partial1,
+  partial2: partial2,
+  partial: partial,
+  rgbToHexString: rgbToHexString,
 };

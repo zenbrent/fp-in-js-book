@@ -94,8 +94,8 @@ describe 'function builders', ->
           expect performCommand type: 'notify', message: 'LOL'
           .to.equal 'Notified LOL'
 
-  describe.only 'currying', ->
-    { curry, curry2 } = builders
+  describe 'currying', ->
+    { curry, curry2, curry3 } = builders
 
     it 'should allow iterating with parseInt', ->
       elevensS = ['11','11','11','11','11']
@@ -111,3 +111,77 @@ describe 'function builders', ->
       # or do binary strings
       expect(_.map elevensS, curry2(parseInt)(2)).to.deep.equal threesN
 
+
+
+    describe 'configuring lodash functions', ->
+      plays = [
+        {artist: "Burial", track: "Archangel"}
+        {artist: "Ben Frost", track: "Stomp"}
+        {artist: "Ben Frost", track: "Stomp"}
+        {artist: "Burial", track: "Archangel"}
+        {artist: "Emeralds", track: "Snores"}
+        {artist: "Burial", track: "Archangel"}]
+
+      playedSongs = [
+        {artist: "Burial", track: "Archangel"}
+        {artist: "Ben Frost", track: "Stomp"}
+        {artist: "Emeralds", track: "Snores"}]
+
+      countedPlays =
+        'Burial - Archangel': 3
+        'Ben Frost - Stomp': 2
+        'Emeralds - Snores' : 1
+
+      songToString = (song) -> "#{song.artist} - #{song.track}"
+
+      it 'should create a configured countBy fn', ->
+        songCount = curry2(_.countBy)(songToString)
+        expect songCount plays
+        .to.deep.equal countedPlays
+
+      it 'should create more configs', ->
+        songsPlayed = curry3(_.uniq)(false)(songToString)
+        expect songsPlayed plays
+        .to.deep.equal playedSongs
+
+      it 'should work with rgbs', ->
+        { rgbToHexString } = builders
+        expect rgbToHexString 255, 255, 255
+        .to.equal '#ffffff'
+
+    describe 'fluent APIs', ->
+      { checker, validator } = fns
+      it 'should create a fluent checker', ->
+        greaterThan = curry2 (lhs, rhs) -> lhs > rhs
+        lessThan = curry2 (lhs, rhs) -> lhs < rhs
+        withinRange = checker(
+          validator 'arg must be greater than 10', greaterThan 10
+          validator 'arg must be less than 20', lessThan 20
+        )
+
+        expect(withinRange 5).to.deep.equal ['arg must be greater than 10']
+        expect(withinRange 15).to.be.empty
+        expect(withinRange 25).to.deep.equal ['arg must be less than 20']
+
+  describe.only 'partial application', ->
+    { partial, partial1, partial2 } = builders
+    div = (a, b) -> a / b
+
+    it 'partial1 should apply 1 argument', ->
+      over10Part1 = partial1 div, 10
+      expect(over10Part1 5).to.equal 2
+
+    it 'partial2 should apply 2 arguments', ->
+      over10By2 = partial2 div, 10, 2
+      expect(over10By2()).to.equal 5
+
+    it 'partial should apply n arguments!', ->
+      over10Part1 = partial div, 10
+      expect(over10Part1 5).to.equal 2
+
+      over10By2 = partial div, 10, 2
+      expect(over10By2()).to.equal 5
+      
+      div10By2By4By5000Partial = partial div, 10, 2, 4, 5000
+      expect(div10By2By4By5000Partial()).to.equal 5
+      # N.B. this is still only using the 1st 2 arguments! Don't be an ass with partial.
