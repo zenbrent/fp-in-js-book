@@ -144,11 +144,16 @@ function always(val) {
 }
 
 /**
+ * Take a method name and return a function that will call that method
+ * on any given object. The method must be the same -- e.g.
+ * var str = invoker('toString', Array::toString)
+ * str(['asdf','qwer']) //=> "asfd,qwer"
+ * str('asdf') //=> undefined
  * defined p76
  */
 function invoker(name, method) {
   return function(target /* args... */) {
-    if (!existy(target)) fail("Must provide a target");
+    if (!existy(target)) intro.fail("Must provide a target");
 
     var targetMethod = target[name],
         args = _.rest(arguments);
