@@ -1,7 +1,7 @@
 { expect } = require 'chai'
 
 _ = require 'lodash'
-{ log, logjson } = require '../src/tools'
+{ log, logjson } = require './fixtures/tools'
 
 sql = require '../src/sqlish-fns'
 

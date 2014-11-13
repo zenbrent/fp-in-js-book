@@ -3,7 +3,7 @@ chai.use require 'chai-things'
 { expect } = chai
 
 _ = require 'lodash'
-{ log, logjson } = require '../src/tools'
+{ log, logjson } = require './fixtures/tools'
 
 fns = require '../src/all_fns'
 builders = require '../src/fn_builders'
@@ -163,7 +163,7 @@ describe 'function builders', ->
         expect(withinRange 15).to.be.empty
         expect(withinRange 25).to.deep.equal ['arg must be less than 20']
 
-  describe.only 'partial application', ->
+  describe 'partial application', ->
     { partial, partial1, partial2 } = builders
     div = (a, b) -> a / b
 
@@ -185,3 +185,6 @@ describe 'function builders', ->
       div10By2By4By5000Partial = partial div, 10, 2, 4, 5000
       expect(div10By2By4By5000Partial()).to.equal 5
       # N.B. this is still only using the 1st 2 arguments! Don't be an ass with partial.
+
+    describe 'using partials to create preconditional validators', ->
+      

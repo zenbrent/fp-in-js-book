@@ -118,6 +118,8 @@ function partial(fn /*, args */) {
     var args = fns.cat(pargs, _.toArray(arguments));
     return fn.apply(fn, args);
   };
+  // or just this:
+  // fun.bind.apply(fun, construct(undefined, args))
 }
 
 module.exports = {

@@ -1,7 +1,7 @@
 { expect } = require 'chai'
 
 _ = require 'lodash'
-{ log, logjson } = require '../src/tools'
+{ log, logjson } = require './fixtures/tools'
 fns = require '../src/fns'
 
 js = require '../src/emulating_ecmascript'
@@ -37,13 +37,18 @@ describe 'dynamic scope', ->
       expect(pingpong.inc(3)).to.equal 4
       expect(pingpong.dec(2)).to.equal 2
 
-    it.skip 'shouldn\'t give access to new functions', ->
-      # Not sure how to actually do this -- it throws and makes the test fail.
-      # There has to be a library somewhere to intercept errors, right?
-      # TODO: Actually, this should be easy to do with the IO hooks - just grab stderr and check the output.
-      pingpong.newFn = ->
-        expect(privateVal).to.not.exist
-        return 'done'
+    it 'shouldn\'t give access to new functions', ->
+      try
+        pingpong.newFn = ->
+          expect(privateVal).to.not.exist
+          return 'done'
 
-      expect(pingpong.newFn()).to.equal 'done'
+        # Not really!!!
+        val = pingpong.newFn()
+        expect(val).to.equal "OH NO THIS SHOULDN'T WORK"
+
+      catch ex
+        expect ex.toString()
+        .to.equal "ReferenceError: privateVal is not defined"
+
 

@@ -1,7 +1,7 @@
 { expect } = require 'chai'
 
 _ = require 'lodash'
-tools = require '../src/tools'
+tools = require './fixtures/tools'
 
 describe 'tools for testing', ->
   testData =

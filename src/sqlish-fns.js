@@ -1,5 +1,5 @@
 /**
- * So far, everything in this is from chapters 1 and 2.
+ * From chapters 1 and 2.
  */
 
 _ = require('lodash');
