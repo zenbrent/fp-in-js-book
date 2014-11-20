@@ -8,7 +8,9 @@ chai.use require 'chai-things'
 
 _ = require 'lodash'
 { log, logjson } = require './fixtures/tools'
-fns = require '../src/fns'
-intro = require '../src/introducing'
+fns = require '../src/all_fns'
+pure = require '../src/purity'
 
 describe.skip 'functional purity', ->
+
+

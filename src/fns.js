@@ -107,7 +107,7 @@ function best(fun, coll) {
  * defined p72
  */
 function repeat(times, value) {
-  return _.map(_.range(times), function() { return value });
+  return _.map(_.range(times), function() { return value; });
 }
 
 /**
@@ -140,7 +140,7 @@ function iterateUntil(fun, check, init) {
  * defined p76
  */
 function always(val) {
-  return function() { return val; }
+  return function() { return val; };
 }
 
 /**
@@ -167,9 +167,10 @@ function invoker(name, method) {
   };
 }
 
-/**
- * defined p77
- */
+/** p76 */
+var rev = invoker('reverse', Array.prototype.reverse);
+
+/** defined p77 */
 function uniqueString(length) {
   return Math.random().toString(36).substr(2, length);
 }
@@ -206,7 +207,7 @@ function defaults(d) {
     var val = fnull(_.identity, d[k]);
     return o && val(o[k]);
   };
-};
+}
 
 /**
  * Something to validate objects!
@@ -229,7 +230,7 @@ function checker(/* validators */) {
         return _.chain(errs).push(check.message).value();
     }, []);
   };
-};
+}
 
 /**
  * Create a validator.
@@ -242,7 +243,7 @@ function validator(message, fun) {
 
   f['message'] = message;
   return f;
-};
+}
 
 /**
  * Check to see if an object has some keys
@@ -259,8 +260,7 @@ function hasKeys() {
 
   fun.message = cat(["Must have values for keys:"], keys).join(' ');
   return fun;
-};
-
+}
 
 module.exports = {
   allOf: allOf,
@@ -285,6 +285,7 @@ module.exports = {
   plucker: plucker,
   repeat: repeat,
   repeatedly: repeatedly,
+  rev: rev,
   uniqueString: uniqueString,
   validator: validator,
 };
