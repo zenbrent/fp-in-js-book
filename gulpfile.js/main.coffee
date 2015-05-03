@@ -10,8 +10,8 @@ paths =
 
 gulp.task 'test', ->
   reporters = { 'html-cov', 'spec', 'nyan', 'dot', 'landing', 'tap', 'list', 'progress', 'json-stream', 'min', 'doc' }
-  gulp.src ['tests/*.coffee', 'tests/*.js'], { read: false }
-    .pipe mocha reporter: reporters['spec']
+  gulp.src ['tests/*.coffee', 'tests/*.es6', 'tests/*.js'], { read: false }
+    .pipe mocha reporter: reporters['min']
     # .pipe mocha { reporter: _.keys(reporters)[_.random(0,_.keys(reporters).length, false)] }
 
 gulp.task 'watch', ->

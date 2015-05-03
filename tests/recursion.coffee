@@ -183,5 +183,3 @@ describe 'recursion', ->
       expect(trampoline evenOline 5).to.be.false
       expect(trampoline evenOline 6).to.be.true
 
-  describe 'generators', ->
-
