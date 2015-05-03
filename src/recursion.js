@@ -201,7 +201,6 @@ function influencedWithStrategy(strategy, lang, graph) {
     strategy(function(x) {
         if (_.isArray(x) && _.first(x) === lang)
             results.push(fn.second(x));
-
         return x;
     }, graph);
 
@@ -245,8 +244,27 @@ function trampoline(fun /*, args */) {
  * Head, seed, and tail function.
  */
 function generator(seed, current, step) {
+    return {
+        head: current(seed),
+        tail: function () {
+            return generator(step(seed), current, step);
+        }
+    }
 }
 
+function genHead(gen) { return gen.head; }
+function genTail(gen) { return gen.tail(); }
+
+function genTake(n, gen) {
+    var doTake = function (x, g, ret) {
+        if (x === 0)
+            return ret;
+        else
+            return _.partial(doTake, x-1, genTail(g), fn.cat(ret, genHead(g)));
+    };
+
+    return trampoline(doTake, n, gen, []);
+}
 
 module.exports = {
     andify: andify,
@@ -257,6 +275,9 @@ module.exports = {
     even: even,
     evenOline: evenOline,
     flat: flat,
+    genHead: genHead,
+    genTail: genTail,
+    genTake: genTake,
     generator: generator,
     influencedWithStrategy: influencedWithStrategy,
     nexts: nexts,
