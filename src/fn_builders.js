@@ -22,30 +22,30 @@ var construct = fns.construct;
  * Defined p87
  */
 function dispatch(/* functions */) {
-  var funs = _.toArray(arguments);
-  var size = funs.length;
+    var funs = _.toArray(arguments);
+    var size = funs.length;
 
-  return function(target /*, args */) {
-    var ret;
-    var args = _.rest(arguments);
+    return function(target /*, args */) {
+        var ret;
+        var args = _.rest(arguments);
 
-    for (var funIndex = 0; funIndex < size; funIndex++) {
-      var fun = funs[funIndex];
-      ret = fun.apply(fun, fns.construct(target, args));
+        for (var funIndex = 0; funIndex < size; funIndex++) {
+            var fun = funs[funIndex];
+            ret = fun.apply(fun, fns.construct(target, args));
 
-      if (existy(ret)) return ret;
-    }
-    return ret;
-  };
+            if (existy(ret)) return ret;
+        }
+        return ret;
+    };
 }
 
 /**
  * Defined p95
  */
 function curry(fn) {
-  return function(arg) {
-    return fn(arg);
-  };
+    return function(arg) {
+        return fn(arg);
+    };
 }
 
 /**
@@ -55,35 +55,35 @@ function curry(fn) {
  * arguments are on the right, e.g. the number and radix in parseInt.
  */
 function curry2(fn) {
-  return function(arg2) {
-    return function(arg1) {
-      return fn(arg1, arg2);
+    return function(arg2) {
+        return function(arg1) {
+            return fn(arg1, arg2);
+        };
     };
-  };
 }
 
 /**
  * Defined p98
  */
 function curry3(fun) {
-  return function(last) {
-    return function(middle) {
-      return function(first) {
-        return fun(first, middle, last);
-      };
+    return function(last) {
+        return function(middle) {
+            return function(first) {
+                return fun(first, middle, last);
+            };
+        };
     };
-  };
 }
 
 /** Convert a number to hex */
 function toHex(n) {
-  var hex = n.toString(16);
-  return (hex.length < 2) ? [0, hex].join(''): hex;
+    var hex = n.toString(16);
+    return (hex.length < 2) ? [0, hex].join(''): hex;
 }
 
 /** Convert an rgb set to hex */
 function rgbToHexString(r, g, b) {
-  return ["#", toHex(r), toHex(g), toHex(b)].join('');
+    return ["#", toHex(r), toHex(g), toHex(b)].join('');
 }
 
 // On General currying:
@@ -91,44 +91,44 @@ function rgbToHexString(r, g, b) {
 // Partial tends to work better when dealing with varargs.
 
 function partial1(fn, arg1) {
-  return function(/* args */) {
-    var args = fns.construct(arg1, arguments);
-    return fn.apply(fn, args);
-  };
-  // or just this:
-  // return fun.bind(undefined, arg1);
+    return function(/* args */) {
+        var args = fns.construct(arg1, arguments);
+        return fn.apply(fn, args);
+    };
+    // or just this:
+    // return fun.bind(undefined, arg1);
 }
 
 function partial2(fn, arg1, arg2) {
-  return function(/* args */) {
-    var args = fns.cat([arg1, arg2], _.toArray(arguments));
-    return fn.apply(fn, args);
-  };
-  // or just this:
-  // return fun.bind(undefined, arg1);
+    return function(/* args */) {
+        var args = fns.cat([arg1, arg2], _.toArray(arguments));
+        return fn.apply(fn, args);
+    };
+    // or just this:
+    // return fun.bind(undefined, arg1);
 }
 
 /**
  * defined p103
  */
 function partial(fn /*, args */) {
-  var pargs = _.rest(arguments);
+    var pargs = _.rest(arguments);
 
-  return function(/* args */) {
-    var args = fns.cat(pargs, _.toArray(arguments));
-    return fn.apply(fn, args);
-  };
-  // or just this:
-  // fun.bind.apply(fun, construct(undefined, args))
+    return function(/* args */) {
+        var args = fns.cat(pargs, _.toArray(arguments));
+        return fn.apply(fn, args);
+    };
+    // or just this:
+    // fun.bind.apply(fun, construct(undefined, args))
 }
 
 module.exports = {
-  curry2: curry2,
-  curry3: curry3,
-  curry: curry,
-  dispatch: dispatch,
-  partial1: partial1,
-  partial2: partial2,
-  partial: partial,
-  rgbToHexString: rgbToHexString,
+    curry2: curry2,
+    curry3: curry3,
+    curry: curry,
+    dispatch: dispatch,
+    partial1: partial1,
+    partial2: partial2,
+    partial: partial,
+    rgbToHexString: rgbToHexString,
 };

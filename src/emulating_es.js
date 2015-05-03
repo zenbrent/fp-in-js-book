@@ -15,11 +15,11 @@ var _ = require('lodash'),
 var globals = {};
 
 function makeBindFun(resolver) {
-  return function(k, v) {
-    var stack = globals[k] || [];
-    globals[k] = resolver(stack, v);
-    return globals;
-  };
+    return function(k, v) {
+        var stack = globals[k] || [];
+        globals[k] = resolver(stack, v);
+        return globals;
+    };
 }
 
 /**
@@ -32,48 +32,48 @@ function makeBindFun(resolver) {
  * specified by the key
  */
 var stackBinder = makeBindFun(function(stack, v) {
-  stack.push(v);
-  return stack;
+    stack.push(v);
+    return stack;
 });
 
 /**
  * Pops the last value binding off the stack associated with a name.
  */
 var stackUnbinder = makeBindFun(function(stack) {
-  stack.pop();
-  return stack;
+    stack.pop();
+    return stack;
 });
 
 /**
  * Look up bound values:
  */
 var dynamicLookup = function(k) {
-  var slot = globals[k] || [];
-  return _.last(slot);
+    var slot = globals[k] || [];
+    return _.last(slot);
 };
 
 /**
  * Encapsulate data in a function.
  */
 var pingpong = (function (){
-  var privateVal = 0;
+    var privateVal = 0;
 
-  return {
-    inc: function (n) {
-      return privateVal += n;
-    },
-    dec: function (n) {
-      return privateVal -= n;
+    return {
+        inc: function (n) {
+            return privateVal += n;
+        },
+        dec: function (n) {
+            return privateVal -= n;
+        }
     }
-  }
 })()
 
 module.exports = {
-  globals: globals,
-  stackBinder: stackBinder,
-  stackUnbinder: stackUnbinder,
-  dynamicLookup: dynamicLookup,
-  pingpong: pingpong,
+    globals: globals,
+    stackBinder: stackBinder,
+    stackUnbinder: stackUnbinder,
+    dynamicLookup: dynamicLookup,
+    pingpong: pingpong,
 };
 
 

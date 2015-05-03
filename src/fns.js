@@ -10,70 +10,70 @@ var existy = intro.existy;
 // defined on p36
 /* check this */
 function allOf() {
-  return _.reduceRight(
-    arguments,
-    function (truth, f) { return truth && f(); },
-    true
-  );
+    return _.reduceRight(
+        arguments,
+        function (truth, f) { return truth && f(); },
+        true
+    );
 }
 
 // defined on p
 function anyOf() {
-  return _.reduceRight(
-    arguments,
-    function (truth, f) { return truth || f(); },
-    false
-  );
+    return _.reduceRight(
+        arguments,
+        function (truth, f) { return truth || f(); },
+        false
+    );
 }
 
 /** defined on p39 */
 // concatenate!
 function cat() {
-  var head = _.first(arguments);
-  if(existy(head))
-    return head.concat.apply(head, _.rest(arguments));
-  else
-    return [];
+    var head = _.first(arguments);
+    if(existy(head))
+        return head.concat.apply(head, _.rest(arguments));
+    else
+        return [];
 }
 
 // defined on p40
 function construct(head,tail) {
-  return cat([head], _.toArray(tail));
+    return cat([head], _.toArray(tail));
 }
 
 // defined on p40
 function mapcat(fn, coll) {
-  return cat.apply(null, _.map(coll, fn));
+    return cat.apply(null, _.map(coll, fn));
 }
 
 // defined on p40
 function butLast(coll) {
-  return _.toArray(coll).slice(0, -1);
+    return _.toArray(coll).slice(0, -1);
 }
 
 // defined on p40
 function interpose(inter, coll) {
-  return butLast(mapcat(function(e) {
-    return construct(e, [inter]);
-  }, coll));
+    return butLast(mapcat(function(e) {
+        return construct(e, [inter]);
+    }, coll));
 }
 
 function compliment(pred) {
-  return function() {
-    return !pred.apply(null, _.toArray(arguments));
-  };
+    return function() {
+        return !pred.apply(null, _.toArray(arguments));
+    };
 }
 
 function isEven(val) {
-  return (val % 2) === 0;
+    return (val % 2) === 0;
 }
 
 var isOdd = compliment(isEven);
 
 function plucker(field) {
-  return function(obj) {
-    return (obj && obj[field]);
-  };
+    return function(obj) {
+        return (obj && obj[field]);
+    };
 }
 
 /**
@@ -83,12 +83,12 @@ function plucker(field) {
  * defined on p70
  */
 function finder(valueFun, bestFun, coll) {
-  return _.reduce(coll, function(best, current) {
-    var bestValue = valueFun(best);
-    var currentValue = valueFun(current);
+    return _.reduce(coll, function(best, current) {
+        var bestValue = valueFun(best);
+        var currentValue = valueFun(current);
 
-    return (bestValue === bestFun(bestValue, currentValue)) ? best : current;
-  });
+        return (bestValue === bestFun(bestValue, currentValue)) ? best : current;
+    });
 }
 
 /**
@@ -98,16 +98,16 @@ function finder(valueFun, bestFun, coll) {
  * defined on p41
  */
 function best(fun, coll) {
-  return _.reduce(coll, function(x,y) {
-    return fun(x,y) ? x : y;
-  });
+    return _.reduce(coll, function(x,y) {
+        return fun(x,y) ? x : y;
+    });
 }
 
 /**
  * defined p72
  */
 function repeat(times, value) {
-  return _.map(_.range(times), function() { return value; });
+    return _.map(_.range(times), function() { return value; });
 }
 
 /**
@@ -115,7 +115,7 @@ function repeat(times, value) {
  * defined p73
  */
 function repeatedly(times, fun) {
-  return _.map(_.range(times), fun);
+    return _.map(_.range(times), fun);
 }
 
 /**
@@ -123,15 +123,15 @@ function repeatedly(times, fun) {
  * Defined p74
  */
 function iterateUntil(fun, check, init) {
-  var ret = [],
-      result = fun(init);
+    var ret = [],
+        result = fun(init);
 
-  while (check(result)) {
-    ret.push(result);
-    result = fun(result);
-  }
+    while (check(result)) {
+        ret.push(result);
+        result = fun(result);
+    }
 
-  return ret;
+    return ret;
 }
 
 /**
@@ -140,7 +140,7 @@ function iterateUntil(fun, check, init) {
  * defined p76
  */
 function always(val) {
-  return function() { return val; };
+    return function() { return val; };
 }
 
 /**
@@ -152,19 +152,19 @@ function always(val) {
  * defined p76
  */
 function invoker(name, method) {
-  return function(target /* args... */) {
-    if (!existy(target)) intro.fail("Must provide a target");
+    return function(target /* args... */) {
+        if (!existy(target)) intro.fail("Must provide a target");
 
-    var targetMethod = target[name],
-        args = _.rest(arguments);
+        var targetMethod = target[name],
+            args = _.rest(arguments);
 
-    return intro.doWhen(
-      (existy(targetMethod) && (method === targetMethod)),
-      function() {
-        return targetMethod.apply(target, args);
-      }
-    );
-  };
+        return intro.doWhen(
+            (existy(targetMethod) && (method === targetMethod)),
+            function() {
+                return targetMethod.apply(target, args);
+            }
+        );
+    };
 }
 
 /** p76 */
@@ -172,7 +172,7 @@ var rev = invoker('reverse', Array.prototype.reverse);
 
 /** defined p77 */
 function uniqueString(length) {
-  return Math.random().toString(36).substr(2, length);
+    return Math.random().toString(36).substr(2, length);
 }
 
 /**
@@ -181,21 +181,21 @@ function uniqueString(length) {
  * defined p80
  */
 function fnull(fn /*, defaults */) {
-  var defaults = _.rest(arguments);
+    var defaults = _.rest(arguments);
 
-  return function(/*args*/) {
-    // Should this map over arguments or defaults? This doesn't
-    // gaurantee anything if the arguments are just not passed in.
-    // e.g.:
-    // safeMult = fnull(((total, n) -> total * n), 1, 1)
-    // safeMult() //> undefined
-    // I would expect 1.
-    var args = _.map(arguments, function(e, i) {
-      return existy(e) ? e : defaults[i];
-    });
+    return function(/*args*/) {
+        // Should this map over arguments or defaults? This doesn't
+        // gaurantee anything if the arguments are just not passed in.
+        // e.g.:
+        // safeMult = fnull(((total, n) -> total * n), 1, 1)
+        // safeMult() //> undefined
+        // I would expect 1.
+        var args = _.map(arguments, function(e, i) {
+            return existy(e) ? e : defaults[i];
+        });
 
-    return fn.apply(null, args);
-  };
+        return fn.apply(null, args);
+    };
 }
 
 /**
@@ -203,10 +203,10 @@ function fnull(fn /*, defaults */) {
  * give the default value provided.
  */
 function defaults(d) {
-  return function(o, k) {
-    var val = fnull(_.identity, d[k]);
-    return o && val(o[k]);
-  };
+    return function(o, k) {
+        var val = fnull(_.identity, d[k]);
+        return o && val(o[k]);
+    };
 }
 
 /**
@@ -215,21 +215,21 @@ function defaults(d) {
  * defined p82
  */
 function checker(/* validators */) {
-  var validators = _.toArray(arguments);
+    var validators = _.toArray(arguments);
 
-  return function(obj) {
-    return _.reduce(validators, function(errs, check) {
-      if (check(obj))
-        return errs;
-      else
-        // _.chain is to avoid:
-        // errs.push(check.message);
-        // return errs;
-        // don't know if I like.
-        // "The use of _.chain definitely requires more characters, but it hides the array mutation nicely."
-        return _.chain(errs).push(check.message).value();
-    }, []);
-  };
+    return function(obj) {
+        return _.reduce(validators, function(errs, check) {
+            if (check(obj))
+                return errs;
+            else
+                // _.chain is to avoid:
+                // errs.push(check.message);
+                // return errs;
+                // don't know if I like.
+                // "The use of _.chain definitely requires more characters, but it hides the array mutation nicely."
+                return _.chain(errs).push(check.message).value();
+        }, []);
+    };
 }
 
 /**
@@ -237,12 +237,12 @@ function checker(/* validators */) {
  * defined p83
  */
 function validator(message, fun) {
-  var f = function(/* args */) {
-    return fun.apply(fun, arguments);
-  };
+    var f = function(/* args */) {
+        return fun.apply(fun, arguments);
+    };
 
-  f['message'] = message;
-  return f;
+    f['message'] = message;
+    return f;
 }
 
 /**
@@ -250,16 +250,16 @@ function validator(message, fun) {
  * defined p84
  */
 function hasKeys() {
-  var keys = _.toArray(arguments);
+    var keys = _.toArray(arguments);
 
-  var fun = function(obj) {
-    return _.every(keys, function(k) {
-      return _.has(obj, k);
-    });
-  };
+    var fun = function(obj) {
+        return _.every(keys, function(k) {
+            return _.has(obj, k);
+        });
+    };
 
-  fun.message = cat(["Must have values for keys:"], keys).join(' ');
-  return fun;
+    fun.message = cat(["Must have values for keys:"], keys).join(' ');
+    return fun;
 }
 
 /**
@@ -269,30 +269,30 @@ var zero = validator("cannot be zero", function(n) { return 0 === n });
 var number = validator("arg must be a number", _.isNumber);
 
 module.exports = {
-  allOf: allOf,
-  always: always,
-  anyOf: anyOf,
-  best: best,
-  butLast: butLast,
-  cat: cat,
-  checker: checker,
-  compliment: compliment,
-  construct: construct,
-  defaults: defaults,
-  finder: finder,
-  fnull: fnull,
-  hasKeys: hasKeys,
-  interpose: interpose,
-  invoker: invoker,
-  isEven: isEven,
-  isOdd: isOdd,
-  iterateUntil: iterateUntil,
-  mapcat: mapcat,
-  plucker: plucker,
-  repeat: repeat,
-  repeatedly: repeatedly,
-  rev: rev,
-  uniqueString: uniqueString,
-  validator: validator,
-  zero: zero,
+    allOf: allOf,
+    always: always,
+    anyOf: anyOf,
+    best: best,
+    butLast: butLast,
+    cat: cat,
+    checker: checker,
+    compliment: compliment,
+    construct: construct,
+    defaults: defaults,
+    finder: finder,
+    fnull: fnull,
+    hasKeys: hasKeys,
+    interpose: interpose,
+    invoker: invoker,
+    isEven: isEven,
+    isOdd: isOdd,
+    iterateUntil: iterateUntil,
+    mapcat: mapcat,
+    plucker: plucker,
+    repeat: repeat,
+    repeatedly: repeatedly,
+    rev: rev,
+    uniqueString: uniqueString,
+    validator: validator,
+    zero: zero,
 };
