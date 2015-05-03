@@ -81,3 +81,106 @@ describe.only 'recursion', ->
       it 'should go down a line', ->
         expect depthSearch(influences, ['Lisp'], [])
         .to.deep.equal ['Lisp', 'Smalltalk', 'Self', 'Lua', 'JavaScript', 'Scheme']
+
+  describe 'recursion and composition', ->
+    { andify, orify } = recurse
+
+    it 'should check if all numbers are even', ->
+      evenNums = andify _.isNumber, fns.isEven
+
+      expect(evenNums 1).to.be.false
+      expect(evenNums 2).to.be.true
+      expect(evenNums 2, 1, 2).to.be.false
+      expect(evenNums 2, 4, 10).to.be.true
+
+    it 'should check if any numbers are zero or odd', ->
+      oddNum = orify fns.isOdd, fns.zero
+
+      expect(oddNum 0).to.be.true
+      expect(oddNum 1).to.be.true
+      expect(oddNum 2).to.be.false
+      expect(oddNum 1, 7, 11).to.be.true
+      expect(oddNum 2, 8, 4).to.be.false
+      expect(oddNum 2, 8, 0, 4).to.be.true
+
+  describe 'mutual recursion', ->
+    { even, flat, deepClone } = recurse
+
+    it 'should check if a number is even', ->
+      expect(even 0).to.be.true
+      expect(even 1).to.be.false
+      expect(even 10).to.be.true
+      expect(even 11).to.be.false
+      expect(even -11).to.be.false
+
+    it 'should flattan an array', ->
+      array = [1, 2, [3], [4, 5, [6], 7, [8, 9]], 0]
+
+      expect(flat array).to.deep.equal [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+
+    it 'should deep clone an object', ->
+      x = [{a: [1, 2, 3], b: 42}, {c: {d: []}}]
+
+      y = deepClone x
+      y[0]['a'][1] = 5
+
+      expect(x).to.not.deep.equal y
+      expect(y).to.deep.equal [{a: [1, 5, 3], b: 42}, {c: {d: []}}]
+
+    describe 'visit', ->
+      {visit} = recurse
+
+      expect(visit _.identity, _.isNumber, 42).to.be.true
+      expect(visit _.isNumber, _.identity, [1, null, 5, 'a']).to.deep.equal [true, false, true, false]
+      expect(visit ((n) -> n * 2 ), fns.rev, _.range(4)).to.deep.equal [6, 4, 2, 0]
+
+    describe 'mc depth walking', ->
+      {postDepth, preDepth, influencedWithStrategy} = recurse
+
+      influences = [
+        ['Lisp', 'Smalltalk'],
+        ['Lisp', 'Scheme'],
+        ['Smalltalk', 'Self'],
+        ['Scheme', 'JavaScript'],
+        ['Scheme', 'Lua'],
+        ['Self', 'Lua'],
+        ['Self', 'JavaScript']
+      ]
+
+      it 'should walk trees', ->
+        postWalkedInfluences = postDepth _.identity, influences
+        expect(postWalkedInfluences).to.deep.equal influences
+        postWalkedInfluences[1][1] = 'Clojure'
+        expect(postWalkedInfluences).to.not.deep.equal influences
+
+        preWalkedInfluences = postDepth _.identity, influences
+        expect(preWalkedInfluences).to.deep.equal influences
+
+        capitalizedLisp = postDepth(
+          (x) -> if x is 'Lisp' then 'LISP' else x
+          influences
+        )
+        manuallyCapitalizedLisp = postDepth _.identity, influences
+        manuallyCapitalizedLisp[0][0] = manuallyCapitalizedLisp[1][0] = 'LISP'
+
+        expect(capitalizedLisp).to.deep.equal manuallyCapitalizedLisp
+
+      it 'should get a list of languages that were influenced by a specific lang', ->
+        influencedByLisp = influencedWithStrategy postDepth, 'Lisp', influences
+        expect(influencedByLisp).to.deep.equal ['Smalltalk', 'Scheme']
+
+  describe 'trampolines', ->
+    {evenOline, trampoline} = recurse
+
+    it 'should trampoline the even/odd functions', ->
+      expect(evenOline(5)).to.be.a.function
+      expect(evenOline(5)()()()()()).to.be.false
+      expect(evenOline(6)()()()()()()).to.be.true
+
+    it 'should auto-trampoline the even/odd functions', ->
+      expect(trampoline evenOline 5).to.be.a.function
+      expect(trampoline evenOline 5).to.be.false
+      expect(trampoline evenOline 6).to.be.true
+
+  describe 'generators', ->
+

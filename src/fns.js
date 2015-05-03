@@ -262,6 +262,12 @@ function hasKeys() {
   return fun;
 }
 
+/**
+ * Check if something is zero
+ */
+var zero = validator("cannot be zero", function(n) { return 0 === n });
+var number = validator("arg must be a number", _.isNumber);
+
 module.exports = {
   allOf: allOf,
   always: always,
@@ -288,4 +294,5 @@ module.exports = {
   rev: rev,
   uniqueString: uniqueString,
   validator: validator,
+  zero: zero,
 };

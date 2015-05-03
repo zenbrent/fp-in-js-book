@@ -5,7 +5,6 @@ awatch = require 'gulp-autowatch'
 source = require 'vinyl-source-stream'
 buffer = require 'vinyl-buffer'
 mocha = require 'gulp-mocha'
-# docker = require './gulp_wrappers/docker.js'
 _ = require 'lodash'
 
 # jsdoc = require 'gulp-jsdoc'
@@ -16,29 +15,6 @@ coffeeify = require 'coffeeify'
 # paths: key is the task name, value is the paths to watch.
 paths =
   test: ['tests/**/*', 'src/**/*']
-
-# # javascript
-# gulp.task 'coffee', ->
-#     bCache = {}
-#     b = browserify paths.coffeeSrc,
-#       debug: true
-#       insertGlobals: false
-#       cache: bCache
-#       extensions: ['.coffee']
-#     b.transform coffeeify
-#     b.bundle()
-#     .pipe source "start.js"
-#     .pipe buffer()
-#     .pipe gulp.dest paths.public
-
-# gulp.task "docker", ->
-#   gulp.src paths.docker
-#     .pipe docker {
-#       outputType: "bare",
-#       wrapped: true
-#     }
-#     .pipe gulp.dest './docs'
-  
 
 gulp.task 'test', ->
   reporters = { 'html-cov', 'spec', 'nyan', 'dot', 'landing', 'tap', 'list', 'progress', 'json-stream', 'min', 'doc' }
