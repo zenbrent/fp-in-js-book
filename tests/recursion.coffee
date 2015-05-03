@@ -11,7 +11,7 @@ _ = require 'lodash'
 fns = require '../src/all_fns'
 recurse = require '../src/recursion'
 
-describe.only 'recursion', ->
+describe 'recursion', ->
   describe 'some very basic things', ->
     { recurseLength, cycle } = recurse
 
@@ -34,6 +34,7 @@ describe.only 'recursion', ->
         expect(constructPair pair, [[],[]]).to.deep.equal a
         expect(constructPair [[],[]], [[],[]]).to.deep.equal [[[]],[[]]]
 
+      it 'should reverse a view values from _.zip', ->
         set = [['a', 'b', 'c'], [1, 2, 3]]
         z = _.zip set
         expect constructPair z[0], constructPair z[1], constructPair z[2], [[],[]]

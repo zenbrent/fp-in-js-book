@@ -4,7 +4,7 @@ _ = require 'lodash'
 log = _.bindKey console, 'log'
 
 # Log a single item. Good for passing in as a callback.
-log1 = _.compose log, _.identity
+log1 = _.compose log, (k) -> k
 
 logdir = _.bindKey console, 'dir'
 

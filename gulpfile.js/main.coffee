@@ -1,16 +1,8 @@
 path = require 'path'
 gulp = require 'gulp'
-concat = require 'gulp-concat'
 awatch = require 'gulp-autowatch'
-source = require 'vinyl-source-stream'
-buffer = require 'vinyl-buffer'
 mocha = require 'gulp-mocha'
 _ = require 'lodash'
-
-# jsdoc = require 'gulp-jsdoc'
-
-coffeeify = require 'coffeeify'
-# browserify = require 'browserify'
 
 # paths: key is the task name, value is the paths to watch.
 paths =
