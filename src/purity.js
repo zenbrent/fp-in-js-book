@@ -16,6 +16,7 @@
  * must set up those same conditions for the very purpose of testing."
  */
 
+var fns = require('./fns');
 var builders = require('./fn_builders');
 var _ = require('lodash');
 
@@ -29,20 +30,39 @@ var rand = builders.partial1(_.random, 1);
  * for better testability and clarity.
  */
 function generateRandomCharacter() {
-  return rand(26).toString(36);
+    return rand(26).toString(36);
 }
 
 function generateString(charGen, len) {
-  return repeatedly(len, charGen).join('');
+    return fns.repeatedly(len, charGen).join('');
 }
 
 function randomString(len) {
-  return generateString(generateRandomCharacter, len);
+    return generateString(generateRandomCharacter, len);
 }
 
+/** p152 */
+function deepFreeze(obj) {
+    if (!Object.isFrozen(obj))
+        Object.freeze(obj);
+
+    for (var key in obj) {
+        if (!obj.hasOwnProperty(key) || !_.isObject(obj[key]))
+            continue;
+
+        deepFreeze(obj[key]);
+    }
+}
+
+/** p155 */
+function merge(/* objs */) {
+    return _.extend.apply(null, fns.construct({}, arguments));
+}
 
 module.exports = {
-  generateRandomCharacter: generateRandomCharacter,
-  generateString: generateString,
-  rand: rand,
+    deepFreeze: deepFreeze,
+    generateRandomCharacter: generateRandomCharacter,
+    generateString: generateString,
+    merge: merge,
+    rand: rand,
 };
