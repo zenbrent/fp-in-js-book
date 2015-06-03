@@ -3,11 +3,8 @@ var mocha = require('gulp-mocha');
 var plumber = require('gulp-plumber');
 var watch = require('gulp-watch');
 
-var testPaths = [
-    'tests/*.coffee',
-    'tests/*.es6',
-    'tests/*.js'
-];
+var testPaths = 'tests/*.*';
+var testWatchPaths = ['tests/**/*.*', 'src/**/*.*'];
 
 var reporters = {
     htmlCov: 'html-cov',
@@ -32,5 +29,5 @@ function runTest()  {
 }
 
 gulp.task('test', runTest);
-gulp.task('watch', () => watch(testPaths, {verbose: true, read: false}, runTest));
+gulp.task('watch', () => watch(testWatchPaths, {verbose: true, read: false}, runTest));
 gulp.task('default', ['test', 'watch']);

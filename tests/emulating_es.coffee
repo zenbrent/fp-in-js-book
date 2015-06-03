@@ -1,9 +1,5 @@
 { expect } = require 'chai'
 
-_ = require 'lodash'
-{ log, logjson } = require './fixtures/tools'
-fns = require '../src/fns'
-
 js = require '../src/emulating_es'
 
 describe 'dynamic scope', ->

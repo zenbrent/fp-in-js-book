@@ -1,5 +1,4 @@
 var chai = require('chai');
-var _ = require('lodash');
 
 var fns = require('../src/all_fns');
 var {log, logjson} = require('./fixtures/tools');
