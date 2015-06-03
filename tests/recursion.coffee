@@ -34,9 +34,10 @@ describe 'recursion', ->
         expect(constructPair pair, [[],[]]).to.deep.equal a
         expect(constructPair [[],[]], [[],[]]).to.deep.equal [[[]],[[]]]
 
-      it 'should reverse a view values from _.zip', ->
+      it 'should reverse a few values from _.zip', ->
         set = [['a', 'b', 'c'], [1, 2, 3]]
-        z = _.zip set
+        # n.b. using unzip because lodash's zip seems to only work with length 2 arrays.
+        z = _.unzip set
         expect constructPair z[0], constructPair z[1], constructPair z[2], [[],[]]
         .to.deep.equal set
 
@@ -54,8 +55,8 @@ describe 'recursion', ->
         pairs = [['a', '1'], ['b', '2'], ['c', '3']]
         zipped = [['a', 'b', 'c'], ['1', '2', '3']]
 
-        expect(_.zip pairs).to.deep.equal zipped
-        expect(_.zip zipped).to.deep.equal pairs
+        expect(_.unzip pairs).to.deep.equal zipped
+        expect(_.unzip zipped).to.deep.equal pairs
 
   describe 'graph walking with recursion!', ->
     { nexts } = recurse
