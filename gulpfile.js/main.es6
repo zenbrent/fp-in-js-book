@@ -20,14 +20,14 @@ var reporters = {
     doc: 'doc'
 };
 
-function runTest()  {
+function runTest(reporter = "spec")  {
     return gulp.src(testPaths, {read: false})
     .pipe(plumber())
     .pipe(mocha({
-        reporter: reporters.min
+        reporter: reporters[reporter]
     }));
 }
 
-gulp.task('test', runTest);
-gulp.task('watch', () => watch(testWatchPaths, {verbose: true, read: false}, runTest));
+gulp.task('test', () => runTest());
+gulp.task('watch', () => watch(testWatchPaths, {verbose: true, read: false}, () => runTest("min")));
 gulp.task('default', ['test', 'watch']);
