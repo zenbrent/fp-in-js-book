@@ -4,8 +4,8 @@
  * in JS without using said features.
  */
 
-var _ = require('lodash'),
-    fns = require('./fns');
+var _ = require('lodash');
+var fns = require('./fns');
 
 /**
  * Simulating a naîve, dynamic scoping mechanism

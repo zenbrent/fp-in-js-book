@@ -2,7 +2,7 @@
  * This file still needs to be split up by chapter.
  */
 
-_ = require('lodash');
+var _ = require('lodash');
 
 var intro = require('./introducing');
 var existy = intro.existy;

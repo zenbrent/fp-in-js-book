@@ -6,7 +6,7 @@
  * Lego blocks to build richer functionality from parts.
  */
 
-_ = require('lodash');
+var _ = require('lodash');
 var intro = require('./introducing');
 var fns = require('../src/fns');
 

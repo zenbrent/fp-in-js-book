@@ -6,26 +6,11 @@ var watch = require('gulp-watch');
 var testPaths = 'tests/*.*';
 var testWatchPaths = ['tests/**/*.*', 'src/**/*.*'];
 
-var reporters = {
-    htmlCov: 'html-cov',
-    spec: 'spec',
-    nyan: 'nyan',
-    dot: 'dot',
-    landing: 'landing',
-    tap: 'tap',
-    list: 'list',
-    progress: 'progress',
-    jsonStream: 'json-stream',
-    min: 'min',
-    doc: 'doc'
-};
-
+// var reporters = ['html-cov', 'spec', 'nyan', 'dot', 'landing', 'tap', 'list', 'progress', 'json-stream', 'min', 'doc'];
 function runTest(reporter = "spec")  {
     return gulp.src(testPaths, {read: false})
     .pipe(plumber())
-    .pipe(mocha({
-        reporter: reporters[reporter]
-    }));
+    .pipe(mocha({reporter}));
 }
 
 gulp.task('test', () => runTest());

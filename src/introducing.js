@@ -5,7 +5,7 @@
  * This file is for the first chapter of the book, introducing functional programming.
  */
 
-_ = require('lodash');
+var _ = require('lodash');
 
 /** defined on p12 */
 function isIndexed(data) {

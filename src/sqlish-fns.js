@@ -2,8 +2,8 @@
  * From chapters 1 and 2.
  */
 
-_ = require('lodash');
-fns = require('./all_fns');
+var _ = require('lodash');
+var fns = require('./all_fns');
 
 /** from p16 */
 function lameCSV(str) {

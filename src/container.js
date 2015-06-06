@@ -1,6 +1,7 @@
 // p162
 // Purity, Immutability, and Policies for Change
 
+var _ = require('lodash');
 var fns = require('../src/all_fns');
 
 // So... why isn't this immutable? and why the constructor?

@@ -3,11 +3,18 @@ var L = require("lodash");
 var U = require("underscore");
 
 var flow = require("../src/flow");
+var fns = require("../src/all_fns");
 
 chai.use(require("chai-things"));
 var { expect } = chai;
 
 describe("flow control", () => {
+    var library = [
+        { title: "SICP", isbn: "0262010771", ed: 1 },
+        { title: "SICP", isbn: "0262510871", ed: 2 },
+        { title: "Joy of Clojure", isbn: "1935182641", ed: 1 }
+    ];
+
     it("should allow basic chaining", () => {
         var person = flow.createPerson();
         person
@@ -18,12 +25,6 @@ describe("flow control", () => {
     });
 
     describe("_.chain, _.tap, _.value", () => {
-        var library = [
-            { title: "SICP", isbn: "0262010771", ed: 1 },
-            { title: "SICP", isbn: "0262510871", ed: 2 },
-            { title: "Joy of Clojure", isbn: "1935182641", ed: 1 }
-        ];
-
         it("should chain shiz together and get intermediary values", () => {
             var books = L.chain(library)
             .pluck("title")
@@ -102,6 +103,185 @@ describe("flow control", () => {
                 chain2.force();
                 expect(tappedVal1).to.deep.equal([2, 4, 6]);
                 expect(tappedVal2).to.deep.equal([2, 4, 6, 9, 8, 7]);
+            });
+        });
+    });
+
+    describe("pipelines", () => {
+        var {pipeline} = flow;
+
+        it("should give null with no value", () => {
+            expect(pipeline()).to.be.undefined;
+        });
+
+        it("should give return a value when no fns are passed", () => {
+            expect(pipeline(123)).to.equal(123);
+        });
+
+        function fifth(a) {
+            return pipeline(a, U.rest, U.rest, U.rest, U.rest, U.first);
+        }
+
+        it("should chain functions", () => {
+            var list = ["a", "b", "c", "d", "e", "f", "g"];
+            expect(fifth(list)).to.equal("e");
+        });
+
+        function negativeFifth(a) {
+            return pipeline(a, fifth, (n) => -n);
+        }
+
+        it("should chain pipelines", () => {
+            var list = [1, 2, 3, 4, 5, 6, 7];
+            expect(negativeFifth(list)).to.equal(-5);
+        });
+
+        describe("with relational fns", () => {
+            var relational = require('../src/sqlish-fns');
+            var {RQL} = flow;
+
+            it("should chain together", () => {
+                var {as, project, restrict} = relational;
+
+                function firstEditions(table) {
+                    return pipeline(table,
+                        (t) => as(t, {ed: 'edition'}),
+                        (t) => project(t, ['title', 'edition', 'isbn']),
+                        (t) => restrict(t, (book) => book.edition === 1)
+                    );
+                }
+
+                expect(firstEditions(library))
+                .to.deep.equal([
+                    { title: "SICP", isbn: "0262010771", edition: 1 },
+                    { title: "Joy of Clojure", isbn: "1935182641", edition: 1 }
+                ]);
+            });
+
+            it("should chain together nicer after curry", () => {
+                var {RQL} = flow;
+
+                function firstEditions(table) {
+                    return pipeline(table,
+                        RQL.as({ed: 'edition'}),
+                        RQL.project(['title', 'edition', 'isbn']),
+                        RQL.restrict((book) => book.edition === 1)
+                    );
+                }
+
+                expect(firstEditions(library))
+                .to.deep.equal([
+                    { title: "SICP", isbn: "0262010771", edition: 1 },
+                    { title: "Joy of Clojure", isbn: "1935182641", edition: 1 }
+                ]);
+            });
+        });
+    });
+
+    describe("monads!", () => {
+        // A testable alternative to log:
+        function log(/* vals */) {
+            log.values.push(U.toArray(arguments).join(" "));
+        }
+        log.reset = function() {
+            log.values = [];
+        }
+
+        function sqr(n) {
+            return Math.pow(n, 2);
+        }
+
+        function note(state) {
+            log("NOTE: " + state);
+        }
+
+        beforeEach(() => log.reset());
+
+        describe("A first attempt", () => {
+            var {actions} = flow;
+
+            var mFns = {
+                mSqr() {
+                    return function(state) {
+                        var answer = sqr(state, 2);
+                        return {answer, state: answer};
+                    }
+                },
+
+                mNote(arr) {
+                    return function(state) {
+                        log("NOTE: " + state);
+                        return {answer: undefined, state};
+                    };
+                },
+
+                mNeg() {
+                    return (state) => ({answer: -state, state: -state});
+                }
+            };
+
+            it("can connect squaring fns", () => {
+                var doubleSquareAction = actions(
+                    [mFns.mSqr(), mFns.mSqr()],
+                    (values) => values
+                );
+
+                expect(doubleSquareAction(10)).to.deep.equal([100, 10000]);
+            });
+
+            it("can combine different functions", () => {
+
+                var negativeSqrFn = actions(
+                    [mFns.mSqr(), mFns.mNote(), mFns.mNeg()],
+                    (_, state) => state
+                );
+
+                expect(negativeSqrFn(10)).to.equal(-100);
+                expect(log.values).to.deep.equal(["NOTE: 100"]);
+            });
+        });
+
+        describe("Lifting functions for brevity", () => {
+            var {actions, lift} = flow;
+
+            var mFns = {
+                mSqr: lift(sqr),
+                mNote: lift(note, U.identity),
+                mNeg: lift((n) => -n)
+            };
+
+            it("can combine different fns more simply", () => {
+                var negativeSqrFn = actions(
+                    [mFns.mSqr(), mFns.mNote(), mFns.mNeg()],
+                    (U, state) => state
+                );
+
+                expect(negativeSqrFn(10)).to.equal(-100);
+                expect(log.values).to.deep.equal(["NOTE: 100"]);
+            });
+        });
+
+        describe("Stack actions using lift", () => {
+            var {pipeline, actions, lift} = flow;
+
+            var push = lift((stack, e) => fns.construct(e, stack));
+            var pop = lift(U.first, U.rest);
+
+            var stackAction = actions(
+                [push(1), push(2), pop()],
+                (values, state) => values
+            );
+
+            it("should do actions", () => {
+                var result = [];
+
+                pipeline(
+                    [],
+                    stackAction,
+                    U.chain
+                ).each((elem) => result.push(elem));
+
+                expect(result).to.deep.equal([[1], [2, 1], 2]);
             });
         });
     });
