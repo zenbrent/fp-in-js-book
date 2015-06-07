@@ -1,4 +1,4 @@
-{ expect } = require 'chai'
+{expect} = require("./fixtures/chai")
 
 js = require '../src/emulating_es'
 

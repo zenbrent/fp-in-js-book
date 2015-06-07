@@ -1,12 +1,8 @@
 var _ = require('lodash');
-var chai = require('chai');
 
 var fns = require('../src/all_fns');
 var recurse = require('../src/recursion');
-var { log, logjson } = require('./fixtures/tools');
-
-chai.use(require('chai-things'));
-var { expect } = chai;
+var {expect} = require("./fixtures/chai");
 
 describe('more recursion', () => {
     describe('generators', () => {

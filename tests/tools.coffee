@@ -1,4 +1,4 @@
-{ expect } = require 'chai'
+{ expect } = require "./fixtures/chai"
 
 _ = require 'lodash'
 tools = require './fixtures/tools'

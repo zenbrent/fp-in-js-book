@@ -2,14 +2,11 @@
 # Chapter 6
 ###
 
-chai = require 'chai'
-chai.use require 'chai-things'
-{ expect } = chai
-
 _ = require 'lodash'
-{ log, logjson } = require './fixtures/tools'
+
 fns = require '../src/all_fns'
 recurse = require '../src/recursion'
+{ expect } = require "./fixtures/chai"
 
 describe 'recursion', ->
   describe 'some very basic things', ->

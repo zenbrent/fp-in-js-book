@@ -1,9 +1,6 @@
-chai = require 'chai'
-chai.use require 'chai-things'
-{ expect } = chai
+{ expect } = require "./fixtures/chai"
 
 _ = require 'lodash'
-{ log, logjson } = require './fixtures/tools'
 
 fns = require '../src/all_fns'
 builders = require '../src/fn_builders'

@@ -1,11 +1,6 @@
-var chai = require('chai');
-
 var fns = require('../src/all_fns');
-var {log, logjson} = require('./fixtures/tools');
 var {Container, ImmutableContainer} = require('../src/container');
-
-chai.use(require('chai-things'));
-var { expect } = chai;
+var {expect} = require("./fixtures/chai");
 
 describe('isolating change with a container object', () => {
     it('should create a value', () => {

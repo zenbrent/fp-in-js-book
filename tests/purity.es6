@@ -1,14 +1,10 @@
 // Chapter 7
 
-var chai = require('chai');
 var _ = require('lodash');
 
 var fns = require('../src/all_fns');
 var pure = require('../src/purity');
-var {log, logjson} = require('./fixtures/tools');
-
-chai.use(require('chai-things'));
-var { expect } = chai;
+var {expect} = require("./fixtures/chai");
 
 describe('functional purity', () => {
     describe('seperating pure from impure with random generators', () => {

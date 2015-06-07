@@ -1,12 +1,9 @@
-var chai = require("chai");
 var L = require("lodash");
 var U = require("underscore");
 
 var flow = require("../src/flow");
 var fns = require("../src/all_fns");
-
-chai.use(require("chai-things"));
-var { expect } = chai;
+var {expect} = require("./fixtures/chai");
 
 describe("flow control", () => {
     var library = [

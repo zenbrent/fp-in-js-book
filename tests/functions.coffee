@@ -1,11 +1,8 @@
-chai = require 'chai'
-chai.use require 'chai-things'
-{ expect } = chai
-
 _ = require 'lodash'
-{ log, logjson } = require './fixtures/tools'
+
 fns = require '../src/fns'
 intro = require '../src/introducing'
+{ expect } = require "./fixtures/chai"
 
 # .to.deep.include.members(testListSorted)
 # .and.have.lengthOf(testList.length)
