@@ -8,6 +8,7 @@
     "chai": "^2.3.0",
     "chai-interface": "^2.0.2",
     "chai-things": "^0.2.0",
+    "class.extend": "^0.9.1",
     "coffee-script": "^1.8.0",
     "gulp": "^3.8.10",
     "gulp-mocha": "^2.0",

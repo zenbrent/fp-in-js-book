@@ -122,7 +122,27 @@ function partial(fn /*, args */) {
     // fun.bind.apply(fun, construct(undefined, args))
 }
 
+/**
+ * p105
+ * Attach preconditions seperately from essential calculations
+ */
+function condition1(/* validators */) {
+    var validators = _.toArray(arguments);
+
+    return function(fun, arg) {
+        var errors = fns.mapcat(function(isValid) {
+            return isValid(arg) ? [] : [isValid.message];
+        }, validators);
+
+        if (!_.isEmpty(errors))
+            throw new Error(errors.join(", "));
+
+        return fun(arg);
+    };
+}
+
 module.exports = {
+    condition1: condition1,
     curry2: curry2,
     curry3: curry3,
     curry: curry,

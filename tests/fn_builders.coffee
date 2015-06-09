@@ -184,4 +184,35 @@ describe 'function builders', ->
       # N.B. this is still only using the 1st 2 arguments! Don't be an ass with partial.
 
     describe 'using partials to create preconditional validators', ->
-      
+      {condition1} = builders
+      {validator} = fns
+
+      complement = (pred) -> () ->
+        !pred.apply(null, _.toArray(arguments))
+
+      zero = (n) -> n is 0
+
+      sqrPre = condition1(
+        validator("arg must not be zero", complement(zero)),
+        validator("arg must be a number", _.isNumber))
+
+      it 'should validate', ->
+        try
+          expect(sqrPre(_.identity, 10)).to.equal(10)
+        catch ex
+          expect(ex).to.not.exist
+          expect.fail()
+
+        try
+          sqrPre(_.identity, 0)
+          expect.fail()
+        catch ex
+          expect(ex.message).to.equal("arg must not be zero")
+
+        try
+          sqrPre(_.identity, "")
+          expect.fail()
+        catch ex
+          expect(ex.message).to.equal("arg must be a number")
+
+    # FIXME: Somehow I missed the rest of the tests for this -- fill them in!
