@@ -4,7 +4,7 @@
 var _ = require('underscore'); 
 var Class = require("class.extend"); // Resig's Class with #extend
 
-var {dispatch, fail, existy, construct} = require("../src/all_fns");
+var {dispatch, fail, existy, construct, invoker} = require("../src/all_fns");
 var {deepClone} = require("../src/recursion");
 
 /**
@@ -136,6 +136,18 @@ var ValidateMixin = {
     }
 };
 
+function Hole1(val) {
+    Container.call(this, val);
+}
+// Do the mixin!
+_.extend(
+    Hole1.prototype,
+    HoleMixin,
+    ValidateMixin,
+    ObserverMixin
+);
+
+
 /**
  * p211
  * Take a function and some number of arguments and set the new value based on the result of a call to that function with the current value and the arguments. 
@@ -157,13 +169,112 @@ var SnapshotMixin = {
     }
 };
 
-module.exports = {
-    polyToStringFn,
-    polyToStringDspch,
-    HierarchicalCASClass,
-    SwapMixin,
+/**
+ * p213 
+ * Note -- this overrides SwapMixin's method
+ */
+var CASMixin = {
+    swap: function(oldVal, f) {
+        if (this._value === oldVal) {
+            this.setValue(f(this._value));
+            return this._value;
+        } else {
+            return undefined;
+        }
+    }
+};
+
+function Hole(val) {
+    Container.call(this, val);
+}
+
+// Do the mixin!
+_.extend(
+    Hole.prototype,
     HoleMixin,
     ValidateMixin,
     ObserverMixin,
+    SwapMixin,
+    SnapshotMixin
+);
+
+
+var CAS = function(val) {
+    Hole.call(this, val);
+}
+
+_.extend(
+    CAS.prototype,
+    HoleMixin,
+    ValidateMixin,
+    ObserverMixin,
+    SwapMixin, // Leaving in SwapMixin in case it gains new functionality later.
+    CASMixin,
+    SnapshotMixin
+);
+
+
+
+/**
+ * p214 Hiding object implementation in functions
+ * This could be the user-facing API:
+ */
+function contain(value) {
+    return new Container(value);
+}
+
+/** Providing the mixin extensions as functions */
+function hole(val /*, validator */) {
+    var h = new Hole();
+
+    var v = _.toArray(arguments)[1];
+    if (v) h.addValidator(v);
+
+    h.setValue(val);
+    return h;
+}
+
+var swap = invoker('swap', Hole.prototype.swap);
+
+function cas(val /*, args */) {
+    var h = hole.apply(this, arguments);
+    var c = new CAS(val);
+    c._validator = h._validator;
+
+    return c;
+}
+
+var compareAndSwap = invoker('swap', CAS.prototype.swap);
+
+var snapshot = (o) => o.snapshot();
+
+var addWatcher = (o, fun) => o.watch(fun);
+
+var containerFns = {
+    contain, hole,
+    swap,
+    cas, compareAndSwap,
+    snapshot,
+    addWatcher,
+}
+
+/**
+ * I believe that by putting a functional face on the container types, I've achieved a level of flexibility not obtainable via an object/method focus.
+ */
+
+
+module.exports = {
+    CAS,
+    CASMixin,
+    HierarchicalCASClass,
+    Hole,
+    Hole1,
+    HoleMixin,
+    ObserverMixin,
     SnapshotMixin,
+    SwapMixin,
+    ValidateMixin,
+    containerFns,
+    polyToStringDspch,
+    polyToStringFn,
 }

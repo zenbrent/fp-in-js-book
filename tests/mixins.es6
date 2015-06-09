@@ -3,7 +3,7 @@
 // Sometimes classes are nice.
 
 var _ = require("lodash");
-var {dispatch, always, isEven, construct} = require("../src/all_fns");
+var {dispatch, always, isEven, isOdd, construct} = require("../src/all_fns");
 var {Container} = require("../src/container");
 
 var {expect} = require("./fixtures/chai");
@@ -55,98 +55,150 @@ describe("mixins", () => {
                 c.swap('not the value', 44);
                 expect.fail();
             } catch (ex) {
-                expect(ex.toString()).to.equal("Error: No match");
+                expect(ex.message).to.equal("No match");
             }
         });
     });
 
     describe("making objects made with mixins", () => {
-        var {HoleMixin, ValidateMixin, ObserverMixin, SwapMixin, SnapshotMixin} = mixins;
+        var {Hole, HoleMixin, ValidateMixin, ObserverMixin, SwapMixin, SnapshotMixin} = mixins;
 
-        // The need for the init method is derived from the direct use of Container in the con‐ structor.
-        function Hole1(val) {
-            Container.call(this, val);
-        }
+        describe("basic mixins", () => {
+            var {Hole1} = mixins;
 
-        // Do the mixin!
-        _.extend(
-            Hole1.prototype,
-            HoleMixin,
-            ValidateMixin,
-            ObserverMixin
-        );
+            // The need for the init method is derived from the direct use of Container in the con‐ structor.
+            it("should make a Hole1", () => {
+                var h = new Hole1(42);
+                h.addValidator(isEven);
+
+                h.setValue(8);
+                expect(h.getValue()).to.equal(8);
+
+                try {
+                    h.setValue(9);
+                    expect.fail();
+                } catch (ex) {
+                    expect(ex.message).to.equal("Attempted to set invalid value 9");
+                }
+
+                expect(h.getValue()).to.equal(8);
+            });
+
+            it("should make an even Hole1", () => {
+                var h = new Hole1(42);
+                h.addValidator(isEven);
+
+                try {
+                    h.setValue(9);
+                    expect.fail();
+                } catch (ex) {
+                    expect(ex.message).to.equal("Attempted to set invalid value 9");
+                }
+            });
+
+            it("can actually be tested w/o instantiating objects", () => {
+                // object mockup
+                var o = {
+                    _value: 0,
+                    setValue: _.identity
+                };
+                _.extend(o, SwapMixin);
+                var result = o.swap(construct, [1,2,3]);
+
+                expect(result).to.deep.equal([0, 1, 2, 3]);
+            });
 
 
-        it("should make a Hole1", () => {
-            var h = new Hole1(42);
-            h.addValidator(isEven);
+            it("can do tons of shiz", () => {
+                var h = new Hole(42);
+                expect(h.snapshot()).to.equal(42);
+                expect(h.swap(always(99))).to.equal(99);
+                expect(h.snapshot()).to.equal(99);
 
-            h.setValue(8);
-            expect(h.getValue()).to.equal(8);
+                var h2 = new Hole({someValue: 42});
+                expect(h2.snapshot()).to.deep.equal({someValue: 42});
+                var obj = {someValue: 99};
+                expect(h2.swap(always(obj))).to.deep.equal({someValue: 99});
+                expect(h2.snapshot()).to.deep.equal({someValue: 99});
+                expect(h2.snapshot()).to.not.equal(obj);
 
-            try {
-                h.setValue(9);
-                expect.fail();
-            } catch (ex) {
-                expect(ex.message).to.equal("Attempted to set invalid value 9");
-            }
+                // starting to look suspiciously like an immutable object.
+            });
 
-            expect(h.getValue()).to.equal(8);
         });
 
-        it("should make an even Hole1", () => {
-            var h = new Hole1(42);
-            h.addValidator(isEven);
+        describe("New types via mixins", () => {
+            var {CAS} = mixins;
 
-            try {
-                h.setValue(9);
-                expect.fail();
-            } catch (ex) {
-                expect(ex.message).to.equal("Attempted to set invalid value 9");
-            }
+            it("should overwrite the swap mixin", () => {
+                var result;
+                var c = new CAS(42);
+
+                result = c.swap(42, always(-1));
+                expect(result).to.equal(-1);
+
+                result = c.snapshot();
+                expect(result).to.equal(-1);
+
+                result = c.swap('not the value', always(100));
+                expect(result).to.be.undefined
+
+                result = c.snapshot();
+                expect(result).to.equal(-1);
+            });
+
         });
 
-        it("can actually be tested w/o instantiating objects", () => {
-            // object mockup
-            var o = {
-                _value: 0,
-                setValue: _.identity
-            };
-            _.extend(o, SwapMixin);
-            var result = o.swap(construct, [1,2,3]);
+        describe("methods are low-level operations", () => {
+            var c = mixins.containerFns;
+            var sqr = (n) => n * n;
 
-            expect(result).to.deep.equal([0, 1, 2, 3]);
+            it("should make a container", () => {
+                var container = c.contain(42);
+                expect(container._value).to.equal(42);
+            });
+
+            it("should make a hole", () => {
+                try {
+                    // N.B. it's easier to enforce contracts with functions -- you
+                    // control the flow more!
+                    var x = c.hole(42, always(false));
+                    expect.fail();
+                } catch (ex) {
+                    expect(ex.message).to.equal("Attempted to set invalid value 42");
+                }
+            });
+
+            it("should do actions on a hole", () => {
+                var notes = [];
+
+                var x = c.hole(42);
+                expect(c.snapshot(x)).to.equal(42);
+
+                c.addWatcher(x, (v) => { notes.push("changed: " + v) });
+
+                c.swap(x, sqr);
+                expect(c.snapshot(x)).to.equal(1764);
+                expect(notes).to.deep.equal(["changed: 42"]);
+            });
+
+            it("should make and use a cas", () => {
+                var x = c.cas(9, isOdd);
+                expect(c.snapshot(x)).to.equal(9);
+
+                c.compareAndSwap(x, 9, always(1));
+                expect(c.snapshot(x)).to.equal(1);
+
+                try {
+                    c.compareAndSwap(x, 1, always(2));
+                    expect.fail();
+                } catch (ex) {
+                    expect(ex.message).to.equal("Attempted to set invalid value 2");
+                }
+
+                c.compareAndSwap(x, 9, always(3));
+                expect(c.snapshot(x)).to.equal(1);
+            });
         });
-
-
-        function Hole2(val) {
-            Container.call(this, val);
-        }
-
-        // Do the mixin!
-        _.extend(
-            Hole2.prototype,
-            HoleMixin,
-            ValidateMixin,
-            ObserverMixin,
-            SwapMixin,
-            SnapshotMixin
-        );
-
-        it("can do tons of shiz", () => {
-            var h = new Hole2(42);
-            expect(h.snapshot()).to.equal(42);
-            expect(h.swap(always(99))).to.equal(99);
-            expect(h.snapshot()).to.equal(99);
-
-            var h2 = new Hole2({someValue: 42});
-            expect(h2.snapshot()).to.deep.equal({someValue: 42});
-            var obj = {someValue: 99};
-            expect(h2.swap(always(obj))).to.deep.equal({someValue: 99});
-            expect(h2.snapshot()).to.deep.equal({someValue: 99});
-            expect(h2.snapshot()).to.not.equal(obj);
-        });
-
     });
-
 });

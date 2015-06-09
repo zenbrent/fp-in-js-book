@@ -44,7 +44,7 @@ describe 'dynamic scope', ->
         expect(val).to.equal "OH NO THIS SHOULDN'T WORK"
 
       catch ex
-        expect ex.toString()
-        .to.equal "ReferenceError: privateVal is not defined"
+        expect ex.message
+        .to.equal "privateVal is not defined"
 
 

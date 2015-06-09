@@ -63,7 +63,7 @@ describe("classless programming", () => {
                 validateTripleStore([[1,3], [7,7,1], [0,9,5]]);
                 expect.fail();
             } catch (ex) {
-                expect(ex.toString()).to.equal("Error: Each array should have three elements")
+                expect(ex.message).to.equal("Each array should have three elements")
             }
         });
 
